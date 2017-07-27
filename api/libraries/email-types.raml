@@ -1,0 +1,39 @@
+#%RAML 1.0 Library
+
+usage: Defines types for the domain of email.
+
+types:
+  #
+  EmailAddress:
+    description: Email address modelled as a regex-restriction of string.
+    type: string
+    pattern: .+\@.+\..+
+    examples:
+      typical: john.doe@company.com
+      simple: john@company.com
+      specific: john@group.org.eu
+      academic: dr.john@physica.cam.ac.uk
+  #
+  Email:
+    description: A very simple email structure.
+    type: object
+    properties: 
+      from?: EmailAddress
+      to?: EmailAddress[]
+      cc?: EmailAddress[]
+      subject?: string
+      body?: string
+    examples:
+      straightforward:
+        from: me@mulesoft.com
+        to: [you@recipient.com]
+        subject: What this email is about
+        body: |
+          First line of this email.
+          Second line of this email.
+      nosender:
+        to: [you@recipient.com]
+        subject: This email's subject is...
+        body: |
+          First line of this email.
+          Second line of this email.

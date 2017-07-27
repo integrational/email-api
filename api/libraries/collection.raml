@@ -1,0 +1,40 @@
+#%RAML 1.0 Library
+
+usage: Use to define resources that represent a collection of items.
+uses: 
+  http: http.raml
+
+resourceTypes: 
+  #
+  collection:
+    post:
+      description: Create and add the <<resourcePathName | !singularize>> given in this request body to this collection of <<resourcePathName>>.
+      body: 
+        type: <<type>>
+      responses: 
+        201:
+          description: |
+            Creation and addition of <<resourcePathName | !singularize>> succeeded.
+            The URL of the new <<resourcePathName | !singularize>> is supplied in the `Location` response header.
+          headers: 
+            Location:
+              type: string
+              description: The URL of the <<resourcePathName | !singularize>>
+              example: /api/v1/resources/123
+          body:
+            type: http.DefaultRespBody
+            example: { "code": 201, "message": "Creation and addition of <<resourcePathName | !singularize>> succeeded. See Location header for <<resourcePathName | !singularize>> URL." }
+  #
+  item:
+    get:
+      description: Retrieve the <<resource>> with the given unique identifier.
+      responses: 
+        200:
+          description: The <<resource>> was found and is returned in the response body.
+          body:
+            type: <<type>>
+        404:
+          description: The requested <<resource>> was not found.
+          body: 
+            type: http.DefaultRespBody
+            example: { "code": 404, "message": "The requested <<resource>> was not found"}

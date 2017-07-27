@@ -1,0 +1,38 @@
+#%RAML 1.0
+title: Email API
+version: 1.2.2
+description: |
+  A simple API to send and retrieve email messages.
+  Does not currently support attachments or non-text bodies.
+baseUri: http://email.cloudhub.io/api/v1
+mediaType: application/json
+securitySchemes:
+  basic: !include securitySchemes/basic.raml
+securedBy: [ basic ]
+uses:
+  email: libraries/email-types.raml
+  http: libraries/http.raml
+  async: libraries/async-polling.raml
+  coll: libraries/collection.raml
+
+/emails:
+  type: { coll.collection: {type: email.Email} }
+  post:
+    description: |
+      Send the email supplied in the body of this POST request.
+      Sending the email may occur synchronously (before returning the response) or asynchronously (delayed; after returning the response), depending on availability of server resources.
+      In the former case a HTTP response with status code `201` is returned, in the latter case one with code `202`.
+    is: [ async.request: {action: send} ]
+    responses: 
+      201:
+        description: |
+          Sending the email succeeded.
+          The URL of the sent email is supplied in the `Location` response header.
+  /{emailID}:
+    uriParameters: 
+      emailID: 
+        type: string
+        description: The unique identifier of the email.
+    type: { coll.item: {resource: email, type: email.Email} }
+    /status:
+      type: { async.status: {resource: email, action: send} }

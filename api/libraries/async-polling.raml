@@ -1,0 +1,56 @@
+#%RAML 1.0 Library
+
+usage: Use to define resources that support asynchronous request processing with polling to retrieve processing status.
+uses: 
+  http: http.raml
+
+traits: 
+  request:
+    description: |
+      Request to asynchronously <<action>> the <<resourcePathName | !singularize>> given in this request body.
+    responses: 
+      202:
+        description: |
+          The request to <<action>> this <<resourcePathName | !singularize>> was accepted and will be fulfilled asynchronously at an unspecified later date.
+          The status URL is supplied in the `Location` response header.
+        headers: 
+          Location:
+            description: |
+              Status URL, i.e., a URL from which to `GET` the latest status of the request to asynchronously <<action>> this <<resourcePathName | !singularize>>.
+            type: string
+            example: <<resourcePath>>/123/status
+        body: 
+          application/json:
+            type: http.DefaultRespBody
+            example: { "code": 202, "message": "Request to asynchronously <<action>> this <<resourcePathName | !singularize>> accepted. See Location header for status URL." }
+
+resourceTypes: 
+  status:
+    description: |
+      Status resource for this <<resource>>, i.e., to request the current latest status of theasynchronous <<action>> of this <<resource>>.
+    get:
+      description: |
+        To retrieve the current latest status of the asynchronous <<action>> of this <<resource>>.
+      responses: 
+        200:
+          description: Asynchronous <<action>> of <<resource>> is still in progress.
+          body:
+            type: http.DefaultRespBody
+            example: { "code": 200, "message": "Asynchronous <<action>> of <<resource>> is still in progress" }
+        303:
+          description: |
+            Asynchronous <<action>> of <<resource>> has completed. 
+            The URL of the <<resource>> is supplied in the `Location` response header.
+          headers: 
+            Location:
+              type: string
+              description: The URL of the <<resource>>
+              example: /api/v1/resources/123
+          body:
+            type: http.DefaultRespBody
+            example: { "code": 303, "message": "Asynchronous <<action>> of <<resource>> completed. See Location header for <<resource>> URL." }
+        404:
+          description: The <<resource>> whose status was requested was not found.
+          body: 
+            type: http.DefaultRespBody
+            example: { "code": 404, "message": "The requested <<resource>> was not found"}
